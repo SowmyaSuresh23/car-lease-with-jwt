@@ -1,0 +1,5 @@
+package com.sowmya.gateway.websecurity;
+
+public class WebSecurityConfiguration {
+
+}

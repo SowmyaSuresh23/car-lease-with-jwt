@@ -1,0 +1,30 @@
+package com.sowmya.customerservice.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
+public class CustomerDetailsResponse extends ResponseDto {
+
+
+  private String customerName;
+
+  private String street;
+
+  private String houseNumber;
+
+  private String zipCode;
+
+  private String place;
+
+  private String email;
+
+  private String phoneNumber;
+
+}

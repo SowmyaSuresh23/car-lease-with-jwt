@@ -1,0 +1,5 @@
+package com.sowmya.customerservice.repository;
+
+public interface CustomerDetailsRepository {
+
+}

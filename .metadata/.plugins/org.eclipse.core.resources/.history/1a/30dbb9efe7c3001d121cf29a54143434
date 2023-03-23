@@ -1,0 +1,10 @@
+package com.sowmya.carleaseplatform.feign;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import com.sowmya.customerservice.dto.CustomerDetailsResponse;
+
+public interface FeignConsumer {
+
+  @GetMapping("/findCustomerDetails")
+  public CustomerDetailsResponse findCustomerByEmailAddress
+}

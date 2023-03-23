@@ -1,0 +1,28 @@
+package com.sowmya.gateway.websecurity;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+
+@Configuration
+@EnableWebFluxSecurity
+public class WebSecurityConfiguration {
+
+  @Bean
+  
+      public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+  
+          http.csrf().disable()
+  
+                  .authorizeExchange()
+  
+                  .anyExchange()
+  
+                  .authenticated()
+  
+                  .and().oauth2Login()
+  
+                  .and().oauth2ResourceServer().jwt();
+  
+          return http.build();
+}
+

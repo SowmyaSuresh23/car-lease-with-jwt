@@ -1,0 +1,12 @@
+package com.sowmya.customerservice.dto;
+
+public class LeaseRateRequest {
+
+  private Float mileage;
+  
+  private Float duration;
+  
+  private Float interestRate;
+  
+  
+}

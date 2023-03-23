@@ -1,0 +1,8 @@
+package com.sowmya.carleaseplatform.constants;
+
+public class CarLeaseServiceConstants {
+
+  // Error constants
+  private static final String ERROR_SAVING_NEW_CAR =
+      "There was an error while saving new car details.";
+}

@@ -1,0 +1,16 @@
+package com.sowmya.carleaseplatform.dto;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class CarLeaseRequest {
+
+  @NotNull(message = "Car number is mandatory")
+  private String carNumber;
+  
+  @NotNull(message = "Duration is mandatory")
+  private Float duration;
+}

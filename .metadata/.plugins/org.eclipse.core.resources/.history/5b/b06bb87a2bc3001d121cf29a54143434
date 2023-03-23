@@ -1,0 +1,15 @@
+package com.sowmya.customerservice.entity;
+
+import java.io.Serializable;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "customer")
+public class CustomerEntity implements Serializable {
+
+  public static void main(String[] args) {
+    findCarByCarNumber
+  }
+
+}

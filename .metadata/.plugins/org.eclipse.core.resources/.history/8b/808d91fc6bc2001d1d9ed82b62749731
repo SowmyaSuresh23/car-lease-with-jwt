@@ -1,0 +1,25 @@
+package com.sowmya.carleaseplatform.entity;
+
+@Entity
+public class CarDetailsEntity {
+
+  private Long carId;
+
+  private String carNumber;
+
+  private String make;
+
+  private String model;
+
+  private String version;
+
+  private Integer noOfDoors;
+
+  private Double co2Emission;
+
+  private Double grossPrice;
+
+  private Double netPrice;
+
+  private Float mileage;
+}

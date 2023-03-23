@@ -1,0 +1,18 @@
+package com.sowmya.customerservice.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class CarLeaseRequest {
+
+  private String carNumber;
+
+  private String customerId;
+
+}

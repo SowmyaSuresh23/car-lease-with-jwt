@@ -1,0 +1,5 @@
+package com.sowmya.customerservice.dto;
+
+public class ResponseDto {
+
+}

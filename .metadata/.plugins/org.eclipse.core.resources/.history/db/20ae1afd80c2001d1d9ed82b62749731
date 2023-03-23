@@ -1,0 +1,30 @@
+package com.sowmya.carleaseplatform.dto;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Builder
+public class CarDetailsRequest {
+
+  private String carNumber;
+
+  private String make;
+
+  private String model;
+
+  private String version;
+
+  private Integer noOfDoors;
+
+  private Double co2Emission;
+
+  private Double grossPrice;
+
+  private Double netPrice;
+
+  private Float mileage;
+}
+

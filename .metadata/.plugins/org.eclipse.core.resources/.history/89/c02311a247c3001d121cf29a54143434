@@ -1,0 +1,18 @@
+package com.sowmya.carleaseplatform.service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.sowmya.carleaseplatform.repository.CarDetailsRepository;
+
+@Service
+public class CarLeaseService {
+
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+  @Autowired
+  private CarDetailsRepository carDetailsRepository;
+
+  public Double calculateLeaseRate
+}

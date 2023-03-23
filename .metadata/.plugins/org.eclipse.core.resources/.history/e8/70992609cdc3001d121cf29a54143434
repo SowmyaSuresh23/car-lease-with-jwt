@@ -1,0 +1,19 @@
+package com.sowmya.carleaseplatform.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.sowmya.carleaseplatform.constants.CarLeaseServiceConstants;
+import com.sowmya.carleaseplatform.dto.CarLeaseCalculationRequest;
+import com.sowmya.carleaseplatform.entity.CarDetailsEntity;
+import com.sowmya.carleaseplatform.exception.DetailsNotFoundException;
+import com.sowmya.carleaseplatform.repository.CarDetailsRepository;
+
+@Service
+public class CarLeaseService {
+
+
+  @Autowired
+  private CarDetailsRepository carDetailsRepository;
+
+ 
+}

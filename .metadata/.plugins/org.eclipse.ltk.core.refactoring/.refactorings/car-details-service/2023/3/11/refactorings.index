@@ -1,0 +1,11 @@
+1678800679283	Rename type 'carDetailsServiceImple'
+1678804780295	Rename type 'CarServiceException'
+1678809477696	Rename compilation unit 'NewCarDetailsRequest.java'
+1678870349586	Rename type 'CarLeasePlatformApplicationTests'
+1678871682176	Delete element
+1678894628084	Rename type 'CarNumberRequest'
+1678905097692	Rename type 'CarLeaseRequest'
+1678907651233	Rename type 'CarNotFoundException'
+1678952105628	Delete element
+1678980489674	Rename type 'CarLeaseDetailsService'
+1678980499369	Rename type 'CarLeaseDetailsServiceI'

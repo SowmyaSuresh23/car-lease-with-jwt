@@ -1,0 +1,9 @@
+package com.sowmya.carleaseplatform.exception;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class CarServiceException extends Exception {
+
+  private String errorMessage;
+}

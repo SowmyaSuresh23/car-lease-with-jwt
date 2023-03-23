@@ -1,0 +1,29 @@
+package com.sowmya.customerservice.service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.sowmya.customerservice.dto.CustomerDetailsRequest;
+import com.sowmya.customerservice.dto.ResponseDto;
+import com.sowmya.customerservice.repository.CustomerDetailsRepository;
+
+@Service
+public class CustomerDetailsServiceImpl {
+
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  
+  @Autowired
+  private CustomerDetailsRepository customerDetailsRepository;
+  
+  public ResponseDto saveNewCustomer(CustomerDetailsRequest newCustomer) {
+    ResponseDto response = new ResponseDto();
+    logger.info("Entering into CustomerDetailsServiceImpl.saveNewCustomer");
+    
+    if(customerDetailsRepository.findByEmail(newCustomer.getEmail()).orElse(null) == null) {
+      
+    }
+    logger.info("Exiting CustomerDetailsServiceImpl.saveNewCustomer");
+  }
+  
+}

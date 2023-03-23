@@ -1,0 +1,30 @@
+package com.sowmya.customerservice.service;
+
+import java.sql.Timestamp;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.sowmya.customerservice.dto.CarLeaseRequest;
+import com.sowmya.customerservice.entity.CarLeaseDetailsEntity;
+import com.sowmya.customerservice.repository.CarLeaseRepository;
+import jakarta.transaction.Transactional;
+
+@Service
+public class CarLeaseDetailsService {
+
+  @Autowired
+  CarLeaseRepository carLeaseRepository;
+
+  @Transactional
+  public void createNewLease(CarLeaseRequest request) {
+    if (carLeaseRepository.countByCarNumberIgnoreCaseAndDeleteFlag(request.getCarNumber(),
+        "N") == 0) {
+      CarLeaseDetailsEntity newLease = CarLeaseDetailsEntity.builder()
+          .carNumber(request.getCarNumber()).duration(request.getDuration())
+          .interestRate(request.getInterestRate()).leaseRate(request.getLeaseRate())
+          .customerId(request.getCustomerId()).deleteFlag("N").createdUser(request.getUserId())
+          .createdTimestamp(new Timestamp(System.currentTimeMillis())).build();
+
+      carLeaseRepository.save(newLease);
+    }
+  }
+}

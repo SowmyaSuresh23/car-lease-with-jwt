@@ -1,0 +1,198 @@
+package com.sowmya.carleaseplatform.service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.sowmya.carleaseplatform.constants.CarLeaseServiceConstants;
+import com.sowmya.carleaseplatform.dto.CarDetailsRequest;
+import com.sowmya.carleaseplatform.dto.CarDetailsResponse;
+import com.sowmya.carleaseplatform.dto.ResponseDto;
+import com.sowmya.carleaseplatform.entity.CarDetailsEntity;
+import com.sowmya.carleaseplatform.exception.CarAlreadyExistsException;
+import com.sowmya.carleaseplatform.exception.CarLeaseServiceException;
+import com.sowmya.carleaseplatform.repository.CarDetailsRepository;
+
+/**
+ * @author Sowmya Suresh
+ *
+ */
+
+
+@Service
+public class CarDetailsServiceImpl {
+
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+  @Autowired
+  CarDetailsRepository carDetailsRepository;
+
+  /**
+   * This method saves new car details after checking if the car number is unique.
+   * 
+   * @param newCar has details of a new car
+   * @return response code and response message after saving
+   * @throws CarLeaseServiceException
+   */
+  public ResponseDto saveCarDetails(CarDetailsRequest newCar) {
+    ResponseDto response = new ResponseDto();
+    logger.info("Entering into CarDetailsServiceImpl.saveCarDetails");
+
+    if (carDetailsRepository.findByCarNumberIgnoreCase(newCar.getCarNumber())
+        .orElse(null) == null) {
+
+      logger.debug("Car is unique");
+      CarDetailsEntity newCarEntity = CarDetailsEntity.builder().carNumber(newCar.getCarNumber())
+          .make(newCar.getMake()).model(newCar.getModel()).version(newCar.getVersion())
+          .noOfDoors(newCar.getNoOfDoors()).co2Emission(newCar.getCo2Emission())
+          .grossPrice(newCar.getGrossPrice()).netPrice(newCar.getNetPrice())
+          .mileage(newCar.getMileage()).build();
+
+      carDetailsRepository.save(newCarEntity);
+
+      logger.debug(CarLeaseServiceConstants.NEW_CAR_SAVE_SUCCESS);
+      response.setResponseCode(CarLeaseServiceConstants.SUCCESS_CODE);
+      response.setResponseMessage(CarLeaseServiceConstants.NEW_CAR_SAVE_SUCCESS);
+
+    } else {
+      logger.debug(CarLeaseServiceConstants.DUPLICATE_CAR_NAME);
+      throw new CarAlreadyExistsException(CarLeaseServiceConstants.DUPLICATE_CAR_NAME);
+    }
+    logger.info("Exiting CarDetailsServiceImpl.saveCarDetails");
+    return response;
+  }
+
+
+
+  /**
+   * This method deletes car details based on car number. It returns an appropriate message when a
+   * car number is not found.
+   * 
+   * @param carNumber
+   * @return response code and response message
+   * @throws CarLeaseServiceException
+   */
+  public ResponseDto deleteCar(String carNumber) throws CarLeaseServiceException {
+    logger.info("Entering into CarDetailsServiceImpl.deleteCar");
+    ResponseDto response = new ResponseDto();
+    try {
+      Long deleteCount = carDetailsRepository.deleteByCarNumberIgnoreCase(carNumber);
+      if (deleteCount > 0) {
+        logger.debug(CarLeaseServiceConstants.DELETE_CAR_SUCCESS);
+        response.setResponseCode(CarLeaseServiceConstants.SUCCESS_CODE);
+        response.setResponseMessage(CarLeaseServiceConstants.DELETE_CAR_SUCCESS);
+      } else {
+        logger.debug(CarLeaseServiceConstants.CAR_NOT_FOUND);
+        response.setResponseCode(CarLeaseServiceConstants.NOT_FOUND);
+        response.setResponseMessage(CarLeaseServiceConstants.CAR_NOT_FOUND);
+      }
+    } catch (Exception exception) {
+      logger.error(CarLeaseServiceConstants.ERROR_DELETING_CAR + exception.getMessage());
+      throw new CarLeaseServiceException(CarLeaseServiceConstants.ERROR_DELETING_CAR);
+    }
+    logger.info("Exiting CarDetailsServiceImpl.deleteCar");
+    return response;
+  }
+
+  /**
+   * This method finds car details based on car number and returns appropriate response if car
+   * cannot be found.
+   * 
+   * @param carNumber
+   * @return car details
+   * @throws CarLeaseServiceException
+   */
+  public CarDetailsResponse findCarByCarNumber(String carNumber) throws CarLeaseServiceException {
+    logger.info("Entering into CarDetailsServiceImpl.findCarByCarNumber");
+    CarDetailsResponse response = new CarDetailsResponse();
+
+    try {
+      CarDetailsEntity carEntity = carDetailsRepository.findByCarNumberIgnoreCase(carNumber);
+      if (carEntity != null) {
+        response = CarDetailsResponse.builder().carNumber(carEntity.getCarNumber())
+            .make(carEntity.getMake()).model(carEntity.getModel()).version(carEntity.getVersion())
+            .noOfDoors(carEntity.getNoOfDoors()).co2Emission(carEntity.getCo2Emission())
+            .grossPrice(carEntity.getGrossPrice()).netPrice(carEntity.getNetPrice())
+            .mileage(carEntity.getMileage()).responseCode(CarLeaseServiceConstants.SUCCESS_CODE)
+            .responseMessage(CarLeaseServiceConstants.FIND_CAR_SUCCESS).build();
+        logger.debug(CarLeaseServiceConstants.FIND_CAR_SUCCESS);
+      } else {
+        logger.debug(CarLeaseServiceConstants.CAR_NOT_FOUND);
+        response.setResponseCode(CarLeaseServiceConstants.NOT_FOUND);
+        response.setResponseMessage(CarLeaseServiceConstants.CAR_NOT_FOUND);
+      }
+    } catch (Exception exception) {
+      logger.error(CarLeaseServiceConstants.ERROR_DELETING_CAR + exception.getMessage());
+      throw new CarLeaseServiceException(CarLeaseServiceConstants.ERROR_DELETING_CAR);
+    }
+    logger.info("Exiting CarDetailsServiceImpl.findCarByCarNumber");
+    return response;
+  }
+
+  /**
+   * This method checks if a car is available and updates corresponding details.
+   * 
+   * @param request car details to be updated
+   * @return response code and response message
+   * @throws CarLeaseServiceException
+   */
+  public ResponseDto updateCarDetailsByName(CarDetailsRequest request)
+      throws CarLeaseServiceException {
+    logger.info("Entering into CarDetailsServiceImpl.updateCarDetailsByName");
+    ResponseDto response = new ResponseDto();
+    try {
+
+      CarDetailsEntity carDetails =
+          carDetailsRepository.findByCarNumberIgnoreCase(request.getCarNumber());
+      if (carDetails != null) {
+        if (request.getMake() != null) {
+          carDetails.setMake(request.getMake());
+        }
+        if (request.getModel() != null) {
+          carDetails.setModel(request.getModel());
+        }
+
+        if (request.getVersion() != null) {
+          carDetails.setVersion(request.getVersion());
+        }
+
+        if (request.getNoOfDoors() != null) {
+          carDetails.setNoOfDoors(request.getNoOfDoors());
+        }
+
+        if (request.getCo2Emission() != null) {
+          carDetails.setCo2Emission(request.getCo2Emission());
+        }
+
+        if (request.getGrossPrice() != null) {
+          carDetails.setGrossPrice(request.getGrossPrice());
+        }
+
+        if (request.getNetPrice() != null) {
+          carDetails.setNetPrice(request.getNetPrice());
+        }
+
+        if (request.getMileage() != null) {
+          carDetails.setMileage(request.getMileage());
+        }
+
+        CarDetailsEntity updatedCar = carDetailsRepository.save(carDetails);
+
+        if (updatedCar != null) {
+          logger.debug(CarLeaseServiceConstants.UPDATE_CAR_SUCCESS);
+          response.setResponseCode(CarLeaseServiceConstants.SUCCESS_CODE);
+          response.setResponseMessage(CarLeaseServiceConstants.UPDATE_CAR_SUCCESS);
+        }
+      } else {
+        logger.debug(CarLeaseServiceConstants.CAR_NOT_FOUND);
+        response.setResponseCode(CarLeaseServiceConstants.NOT_FOUND);
+        response.setResponseMessage(CarLeaseServiceConstants.CAR_NOT_FOUND);
+      }
+    } catch (Exception exception) {
+      logger.error(CarLeaseServiceConstants.ERROR_UPDATING_CAR + exception.getMessage());
+      throw new CarLeaseServiceException(CarLeaseServiceConstants.ERROR_UPDATING_CAR);
+    }
+    logger.info("Exiting CarDetailsServiceImpl.updateCarDetailsByName");
+    return response;
+  }
+}

@@ -1,0 +1,9 @@
+package com.sowmya.customerservice.dto;
+
+public class CarLeaseRequest {
+
+  private String carNumber;
+  
+  private String customerId;
+  
+}

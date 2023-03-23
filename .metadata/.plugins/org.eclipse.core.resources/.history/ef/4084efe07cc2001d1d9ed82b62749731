@@ -1,0 +1,13 @@
+package com.sowmya.carleaseplatform.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import com.sowmya.carleaseplatform.entity.CarDetailsEntity;
+
+@Repository
+public interface CarDetailsRepository extends JpaRepository<CarDetailsEntity, Long> {
+
+  public Long countByCarNumberIgnoreCase(String carNumber);
+  
+  public Long deleteByCarNumberIgnoreCase(String carNumber);
+}

@@ -1,0 +1,5 @@
+package com.sowmya.carleaseplatform.feign;
+
+public class FeignConsumer {
+
+}

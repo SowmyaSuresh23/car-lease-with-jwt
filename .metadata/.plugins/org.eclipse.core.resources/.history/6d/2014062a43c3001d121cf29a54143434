@@ -1,0 +1,5 @@
+package com.sowmya.customerservice.entity;
+
+public class CarLeaseDetailsEntity {
+
+}

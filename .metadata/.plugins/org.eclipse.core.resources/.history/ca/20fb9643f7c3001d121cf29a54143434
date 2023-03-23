@@ -1,0 +1,23 @@
+package com.sowmya.carleaseplatform.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class LeaseDetailsResponse {
+
+  private Long leaseId;
+  private Float duration;
+  private Float interestRate;
+  private Double leaseRate;
+  private CarDetailsResponse carDetails;
+  private CustomerDetailsResponse customerDetails;
+
+
+
+}

@@ -1,0 +1,110 @@
+package com.sowmya.carleaseplatform.service;
+
+import java.sql.Timestamp;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.sowmya.carleaseplatform.constants.CarLeaseServiceConstants;
+import com.sowmya.carleaseplatform.dto.CarDetailsResponse;
+import com.sowmya.carleaseplatform.dto.CarLeaseCalculationRequest;
+import com.sowmya.carleaseplatform.dto.CarLeaseRequest;
+import com.sowmya.carleaseplatform.dto.CustomerDetailsResponse;
+import com.sowmya.carleaseplatform.dto.LeaseDetailsResponse;
+import com.sowmya.carleaseplatform.dto.ResponseDto;
+import com.sowmya.carleaseplatform.entity.CarDetailsEntity;
+import com.sowmya.carleaseplatform.entity.CarLeaseDetailsEntity;
+import com.sowmya.carleaseplatform.exception.CarLeaseException;
+import com.sowmya.carleaseplatform.exception.DetailsNotFoundException;
+import com.sowmya.carleaseplatform.feign.FeignConsumer;
+import com.sowmya.carleaseplatform.repository.CarDetailsRepository;
+import com.sowmya.carleaseplatform.repository.CarLeaseRepository;
+import jakarta.transaction.Transactional;
+
+@Service
+public class CarLeaseDetailsService {
+
+  @Autowired
+  CarLeaseRepository carLeaseRepository;
+
+  @Autowired
+  CarDetailsRepository carDetailsRepository;
+
+  @Autowired
+  FeignConsumer feignConsumer;
+
+  public Double calculateLeaseRate(CarLeaseCalculationRequest request) {
+
+    CarDetailsEntity carDetails =
+        carDetailsRepository.findByCarNumberIgnoreCase(request.getCarNumber()).orElseThrow(
+            () -> new DetailsNotFoundException(CarLeaseServiceConstants.CAR_NOT_FOUND));
+
+    return (((carDetails.getMileage() / 12) * request.getDuration()) / carDetails.getNetPrice())
+        + (((request.getInterestRate() / 100) * carDetails.getNetPrice()) / 12);
+  }
+
+  @Transactional
+  public Long createNewLease(CarLeaseRequest request) {
+
+    CarDetailsEntity carDetails =
+        carDetailsRepository.findByCarNumberIgnoreCase(request.getCarNumber()).orElseThrow(
+            () -> new DetailsNotFoundException(CarLeaseServiceConstants.CAR_NOT_FOUND));
+    try {
+      feignConsumer.findCustomerByEmailAddress(request.getCustomerEmail());
+    } catch (Exception ex) {
+      throw new DetailsNotFoundException(CarLeaseServiceConstants.CUSTOMER_NOT_FOUND);
+    }
+    if (carDetails.getCarLeaseDetails() == null) {
+      CarLeaseDetailsEntity newLease = CarLeaseDetailsEntity.builder()
+          .duration(request.getDuration()).interestRate(request.getInterestRate())
+          .leaseRate(request.getLeaseRate()).customerEmail(request.getCustomerEmail())
+          .carDetails(carDetails).createdUser(request.getUserId())
+          .createdTimestamp(new Timestamp(System.currentTimeMillis())).build();
+
+      CarLeaseDetailsEntity savedLease = carLeaseRepository.save(newLease);
+      return savedLease.getLeaseId();
+    } else {
+      throw new CarLeaseException(CarLeaseServiceConstants.CAR_UNAVAILABLE_FOR_LEASE);
+    }
+
+
+  }
+
+  @Transactional
+  public LeaseDetailsResponse findLeaseDetails(Long leaseId) {
+    CarLeaseDetailsEntity carLeaseDetails = carLeaseRepository.findById(leaseId)
+        .orElseThrow(() -> new DetailsNotFoundException(CarLeaseServiceConstants.LEASE_NOT_FOUND));
+    CustomerDetailsResponse customerDetails =
+        feignConsumer.findCustomerByEmailAddress(carLeaseDetails.getCustomerEmail());
+
+    CarDetailsResponse carDetails =
+        CarDetailsResponse.builder().carNumber(carLeaseDetails.getCarDetails().getCarNumber())
+            .make(carLeaseDetails.getCarDetails().getMake())
+            .model(carLeaseDetails.getCarDetails().getModel())
+            .version(carLeaseDetails.getCarDetails().getVersion())
+            .noOfDoors(carLeaseDetails.getCarDetails().getNoOfDoors())
+            .co2Emission(carLeaseDetails.getCarDetails().getCo2Emission())
+            .grossPrice(carLeaseDetails.getCarDetails().getGrossPrice())
+            .netPrice(carLeaseDetails.getCarDetails().getNetPrice()).build();
+    LeaseDetailsResponse leaseDetails =
+        LeaseDetailsResponse.builder().leaseId(carLeaseDetails.getLeaseId())
+            .duration(carLeaseDetails.getDuration()).interestRate(carLeaseDetails.getInterestRate())
+            .leaseRate(carLeaseDetails.getLeaseRate()).customerDetails(customerDetails)
+            .carDetails(carDetails).responseCode(CarLeaseServiceConstants.SUCCESS_CODE).build();
+
+    return leaseDetails;
+  }
+
+  @Transactional
+  public ResponseDto deleteLeaseDetails(Long leaseId) {
+    ResponseDto response = new ResponseDto();
+    Long count = carLeaseRepository.deleteByLeaseId(leaseId);
+    if (count > 0) {
+      response = ResponseDto.builder().responseCode(CarLeaseServiceConstants.SUCCESS_CODE)
+          .responseMessage(CarLeaseServiceConstants.LEASE_DELETE_SUCCESS).build();
+    } else {
+      throw new DetailsNotFoundException(CarLeaseServiceConstants.CAR_NOT_FOUND);
+    }
+    return response;
+  }
+
+
+}

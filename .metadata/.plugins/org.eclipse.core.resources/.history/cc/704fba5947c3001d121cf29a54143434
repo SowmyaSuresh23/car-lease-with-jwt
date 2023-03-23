@@ -1,0 +1,11 @@
+package com.sowmya.carleaseplatform.dto;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class CarLeaseRequest {
+
+  private String carNumber;
+}

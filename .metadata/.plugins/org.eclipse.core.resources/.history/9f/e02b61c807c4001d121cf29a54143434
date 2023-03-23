@@ -1,0 +1,5 @@
+package com.sowmya.gateway.repository;
+
+public interface UserRepository {
+
+}

@@ -1,0 +1,164 @@
+package com.sowmya.carleaseplatform;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+import java.util.Optional;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import com.sowmya.carleaseplatform.constants.CarLeaseServiceConstants;
+import com.sowmya.carleaseplatform.dto.CarDetailsRequest;
+import com.sowmya.carleaseplatform.dto.ResponseDto;
+import com.sowmya.carleaseplatform.entity.CarDetailsEntity;
+import com.sowmya.carleaseplatform.repository.CarDetailsRepository;
+import com.sowmya.carleaseplatform.service.CarDetailsService;
+
+@ExtendWith(MockitoExtension.class)
+@WebMvcTest(CarDetailsService.class)
+public class CarDetailsServiceUnitTest {
+
+  @MockBean
+  private CarDetailsRepository carDetailsRepository;
+
+  @Autowired
+  private CarDetailsService carDetailsService;
+
+  @Test
+  public void saveCarSuccessTest() throws Exception { 
+      
+      when(carDetailsRepository.findByCarNumberIgnoreCase(Mockito.any(String.class))).thenReturn(null);
+      when(carDetailsRepository.save(Mockito.any(CarDetailsEntity.class))).thenReturn(new CarDetailsEntity());
+      
+      CarDetailsRequest newCar = CarDetailsRequest.builder().carNumber("2-XXX-90").make("Toyota")
+          .model("Camry").version("2").noOfDoors(4).co2Emission(125D).grossPrice(40000D)
+          .netPrice(38000D).mileage(19F).userName("Sowmya").build();
+      
+      ResponseDto saveResponse = carDetailsService.saveCarDetails(newCar);
+      assertThat(saveResponse.getResponseCode().equalsIgnoreCase(CarLeaseServiceConstants.SUCCESS_CODE));
+      
+  }
+
+  @Test
+  public void saveCarWithInvalidRequestTest() throws Exception { 
+      
+      when(carDetailsRepository.findByCarNumberIgnoreCase(Mockito.any(String.class))).thenReturn(null);
+      when(carDetailsRepository.save(Mockito.any(CarDetailsEntity.class))).thenReturn(new CarDetailsEntity());
+      
+      CarDetailsRequest newCar = CarDetailsRequest.builder().carNumber("2-XXX-90000").make("Toyota")
+          .model("Camry").version("2").noOfDoors(4).co2Emission(125D).grossPrice(40000D)
+          .netPrice(38000D).mileage(19F).userName("Sowmya").build();
+      
+      ResponseDto saveResponse = carDetailsService.saveCarDetails(newCar);
+      assertThat(saveResponse.getResponseCode().equalsIgnoreCase(CarLeaseServiceConstants.BAD_REQUEST));
+      
+  }
+
+  @Test
+  public void saveDuplicateCarTest() throws Exception { 
+      when(carDetailsRepository.findByCarNumberIgnoreCase(Mockito.any(String.class))).thenReturn(Optional.of(new CarDetailsEntity()));
+      when(carDetailsRepository.save(Mockito.any(CarDetailsEntity.class))).thenReturn(new CarDetailsEntity());
+      
+      CarDetailsRequest newCar = CarDetailsRequest.builder().carNumber("2-XXX-90").make("Toyota")
+          .model("Camry").version("2").noOfDoors(4).co2Emission(125D).grossPrice(40000D)
+          .netPrice(38000D).mileage(19F).userName("Sowmya").build();
+      
+      ResponseDto saveResponse = carDetailsService.saveCarDetails(newCar);
+      assertThat(saveResponse.getResponseCode().equalsIgnoreCase(CarLeaseServiceConstants.CONFLICT));
+      
+  }
+
+  @Test
+  public void deleteCarSuccessTest() throws Exception {
+      when(carDetailsRepository.deleteByCarNumberIgnoreCase(Mockito.any(String.class))).thenReturn(1L);
+      
+      ResponseDto saveResponse = carDetailsService.deleteCar("2-XXX-90");
+      assertThat(saveResponse.getResponseCode().equalsIgnoreCase(CarLeaseServiceConstants.SUCCESS_CODE));
+      assertThat(saveResponse.getResponseMessage().equalsIgnoreCase(CarLeaseServiceConstants.DELETE_CAR_SUCCESS));
+  }
+  
+  @Test
+  public void deleteUnavailableCarTest() throws Exception {
+      when(carDetailsRepository.deleteByCarNumberIgnoreCase(Mockito.any(String.class))).thenReturn(0L);
+      
+      ResponseDto saveResponse = carDetailsService.deleteCar("2-XXX-9000");
+      assertThat(saveResponse.getResponseCode().equalsIgnoreCase(CarLeaseServiceConstants.CONFLICT));
+      assertThat(saveResponse.getResponseMessage().equalsIgnoreCase(CarLeaseServiceConstants.CAR_NOT_FOUND));
+  }
+  
+  @Test
+  public void updateCarSuccessTest() throws Exception {
+      when(carDetailsRepository.findByCarNumberIgnoreCase(Mockito.any(String.class))).thenReturn(Optional.of(new Recipe()));
+      when(carDetailsRepository.save(Mockito.any(Recipe.class))).thenReturn(new Recipe());
+      
+      UpdateRecipeRequest updateRequest = new UpdateRecipeRequest();
+      updateRequest = UpdateRecipeRequest.builder().recipeName("Omelette").noOfServings(3).ingredients("Eggs,oil").instruction("1. Beat the eggs.\n"
+              + "2. Pour the eggs in a pan.\n"
+              + "3. Add oil.\n"
+              + "3. Cover the lid and cook for a minute.").isVegetarian("Y").userName("Sowmya").build();
+      ResponseDto response = carDetailsService.updateRecipe(updateRequest);
+      assertThat(response.getResponseCode().equalsIgnoreCase(CarLeaseServiceConstants.SUCCESS_CODE));
+      assertThat(response.getResponseMessage().equalsIgnoreCase(CarLeaseServiceConstants.UPDATE_RECIPE_SUCCESSFUL));
+  }
+  
+  @Test
+  public void updateUnavailableRecipeTest() throws Exception {
+      when(carDetailsRepository.findByRecipeNameIgnoreCase(Mockito.any(String.class))).thenReturn(null);
+      when(carDetailsRepository.save(Mockito.any(Recipe.class))).thenReturn(new Recipe());
+      
+      UpdateRecipeRequest updateRequest = new UpdateRecipeRequest();
+      updateRequest = UpdateRecipeRequest.builder().recipeName("Omelette").noOfServings(3).ingredients("Eggs,oil").instruction("1. Beat the eggs.\n"
+              + "2. Pour the eggs in a pan.\n"
+              + "3. Add oil.\n"
+              + "3. Cover the lid and cook for a minute.").isVegetarian("Y").userName("Sowmya").build();
+      ResponseDto response = carDetailsService.updateRecipe(updateRequest);
+      assertThat(response.getResponseCode().equalsIgnoreCase(CarLeaseServiceConstants.NOT_FOUND));
+      assertThat(response.getResponseMessage().equalsIgnoreCase(CarLeaseServiceConstants.RECIPE_NOT_FOUND));
+  }
+  
+  @Test
+  public void updateRecipeExceptionTest() throws Exception {
+      when(carDetailsRepository.findByRecipeNameIgnoreCase(Mockito.any(String.class))).thenThrow(new PersistenceException());
+      when(carDetailsRepository.save(Mockito.any(Recipe.class))).thenReturn(new Recipe());
+      
+      assertThrows(CustomException.class, () -> {
+          UpdateRecipeRequest updateRequest = new UpdateRecipeRequest();
+          updateRequest = UpdateRecipeRequest.builder().recipeName("Omelette").noOfServings(3).ingredients("Eggs,oil").instruction("1. Beat the eggs.\n"
+                  + "2. Pour the eggs in a pan.\n"
+                  + "3. Add oil.\n"
+                  + "3. Cover the lid and cook for a minute.").isVegetarian("Y").userName("Sowmya").build();
+          carDetailsService.updateRecipe(updateRequest);
+      });
+      
+  }
+  
+  @Test
+  public void findRecipeByNameSuccessTest() throws Exception {
+      when(carDetailsRepository.findByRecipeNameContainingIgnoreCase(Mockito.any(String.class))).thenReturn(List.of(new Recipe()));
+      
+      RecipeListResponseDto response = carDetailsService.findRecipeByName("Omelette");
+      assertThat(response.getResponseCode().equalsIgnoreCase(CarLeaseServiceConstants.SUCCESS_CODE));
+      assertThat(response.getResponseMessage().equalsIgnoreCase(CarLeaseServiceConstants.FECTH_RECIPE_SUCCESSFUL));
+  }
+  
+  @Test
+  public void findUnavailableRecipeTest() throws Exception {
+      when(carDetailsRepository.findByRecipeNameContainingIgnoreCase(Mockito.any(String.class))).thenReturn(null);
+      
+      RecipeListResponseDto response = carDetailsService.findRecipeByName("Omelette");
+      assertThat(response.getResponseCode().equalsIgnoreCase(CarLeaseServiceConstants.NOT_FOUND));
+      assertThat(response.getResponseMessage().equalsIgnoreCase(CarLeaseServiceConstants.RECIPE_NOT_FOUND));
+  }
+  
+  @Test
+  public void findRecipeByNameExceptionTest() throws Exception {
+      when(carDetailsRepository.findByRecipeNameContainingIgnoreCase(Mockito.any(String.class))).thenThrow(new PersistenceException());
+      
+      assertThrows(CustomException.class, () -> {
+          carDetailsService.findRecipeByName("Omelette");
+      });
+  }
+}

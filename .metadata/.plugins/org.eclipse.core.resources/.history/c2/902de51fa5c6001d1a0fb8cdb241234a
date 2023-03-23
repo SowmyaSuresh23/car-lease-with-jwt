@@ -1,0 +1,5 @@
+package com.sowmya.carleaseplatform.config;
+
+public class InterceptorConfig {
+
+}

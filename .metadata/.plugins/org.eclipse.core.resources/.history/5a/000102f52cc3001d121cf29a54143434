@@ -1,0 +1,6 @@
+package com.sowmya.customerservice.exception;
+
+public class CustomerAlreadyExistsException extends RuntimeException {
+
+  private String errorMessage;
+}
